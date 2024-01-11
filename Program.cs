@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Server.IISIntegration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace WebAPIAuth
 {
@@ -17,7 +18,41 @@ namespace WebAPIAuth
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "WeatherForecastAPI",
+                    Version = "v1",
+                    Description = "Weather forecast test API with authorization.",
+                });
+
+                OpenApiSecurityScheme openApiSecurityScheme = new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Description = "JWT token must be provided. Enter __ONLY__ bearer token below.",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = JwtBearerDefaults.AuthenticationScheme,
+                    Reference = new OpenApiReference
+                    {
+                        Id = "Bearer",
+                        Type = ReferenceType.SecurityScheme,
+                    }
+                };
+
+                options.AddSecurityDefinition("Bearer", openApiSecurityScheme);
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        openApiSecurityScheme,
+                        new string[]{ }
+                    }
+                });
+
+            });
 
             // API KEY Auth https://github.com/mihirdilip/aspnetcore-authentication-apikey
             //  - with policy https://code-maze.com/aspnetcore-api-key-authentication/
