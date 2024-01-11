@@ -20,6 +20,7 @@ namespace WebAPIAuth
             builder.Services.AddSwaggerGen();
 
             // API KEY Auth https://github.com/mihirdilip/aspnetcore-authentication-apikey
+            //  - with policy https://code-maze.com/aspnetcore-api-key-authentication/
 
             // NTLM Auth
             //builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
