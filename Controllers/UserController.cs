@@ -134,6 +134,46 @@ namespace WebAPIAuth.Controllers
 
         }
 
+        /// <summary>
+        /// Get information for API user from principal, API Key authorization.
+        /// </summary>
+        /// <returns>User information from Principal/Claims</returns>
+        /// <response code="200">User information about curent API user.</response>
+        /// <response code="401">This response will be returned if the request is not authorized to access this resource.</response>
+        /// <response code="500">This response will be returned if there is an error in the system that prevents the purchase from being completed.</response>
+        [HttpGet]
+        [Route("GetIdentityUser")]
+        [ProducesResponseType(typeof(UserInformation), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [Authorize(AuthenticationSchemes = ApiKey.ApiKeyDefaults.AuthenticationScheme)]
+        public IActionResult GetIdentityUser()
+        {
+            try
+            {
+                // Get NameIdentifier from HttpContext.User
+                Int32.TryParse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier), out var nameIdentifier);
+                // Or use Identity from ClaimsPrincipal
+                var name = HttpContext.User.Identity?.Name;
+                var authType = HttpContext.User.Identity?.AuthenticationType;
+                var roles = HttpContext.User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToArray();
+                var user = new UserInformation()
+                {
+                    Id = nameIdentifier,
+                    Name = name,
+                    AuthenticationType = authType,
+                    Roles = roles
+                };
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+
+        }
+
+
         // To generate JWT token
         private string GenerateToken(string user, int userId, params string[] roles)
         {

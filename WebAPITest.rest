@@ -25,6 +25,12 @@ Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
 ###
+# Information about API user
+GET {{baseUrl}}/User/GetIdentityUser HTTP/1.1
+Content-Type: {{contentType}}
+X-API-KEY: API-KEY-123
+
+###
 # Get weather forecast, Bearer authorization
 GET {{baseUrl}}/WeatherForecast HTTP/1.1
 Content-Type: {{contentType}}

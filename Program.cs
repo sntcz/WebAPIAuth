@@ -65,7 +65,7 @@ namespace WebAPIAuth
                     Reference = new OpenApiReference
                     {
                         Id = "ApiKey",
-                        Type = ReferenceType.SecurityScheme                        
+                        Type = ReferenceType.SecurityScheme
                     }
                 };
 
@@ -133,7 +133,17 @@ namespace WebAPIAuth
                 //    return Task.CompletedTask;
                 //};
             })
-            .AddApiKey(options => { options.ApiKey = builder.Configuration["ApiKey"]; });
+            .AddApiKey(options =>
+            {
+                options.ApiKey = builder.Configuration["ApiKey:Key"];
+                options.OwnerName = builder.Configuration["ApiKey:Owner"];
+                string roles = builder.Configuration["ApiKey:Roles"];
+                if (roles != null)
+                {
+                    options.Roles = roles.Split(new char[] { ',', ';' },
+                        StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                }
+            });
             // <---- Mixed Auth
 
             /* ---- nevím jestli to musí být ----> */
