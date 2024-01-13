@@ -10,8 +10,9 @@ using WebAPIAuth.Models;
 
 namespace WebAPIAuth.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Produces("application/json")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UserController : ControllerBase
     {
@@ -24,6 +25,10 @@ namespace WebAPIAuth.Controllers
             this.config = config;
         }
 
+        /// <summary>
+        /// Login for NTLM user (from browser)
+        /// </summary>
+        /// <returns>JWT Bearer token</returns>
         [HttpGet]
         [Route("Login")]
         [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
@@ -50,6 +55,11 @@ namespace WebAPIAuth.Controllers
             }
         }
 
+        /// <summary>
+        /// Login for any application user (name/password validation)
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>JWT Bearer token</returns>
         [HttpPost]
         [Route("Login")]
         [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
@@ -61,15 +71,17 @@ namespace WebAPIAuth.Controllers
         {
             try
             {
-                if (user.UserName == null)
+                if (String.IsNullOrEmpty(user.UserName))
                 {
                     // Do not throw exception withou try/catch
-                    throw new Exception("Invalid input, null user structure.");
+                    throw new Exception("Invalid input, no userName.");
                 }
 
                 logger.LogInformation($"Login: {user.UserName}");
                 // Load UserID from user name and check the password
-                if (user.Password == "123" || user.Password == String.Empty)
+                if (user.Password == "123" ||
+                    user.Password == "P@ssw0rd" || // Magic password :-)
+                    user.Password == String.Empty)
                 {
                     int id = 5; // Magic number !!!
                     string token = GenerateToken(user.UserName, id, user.UserName.StartsWith("a") ? "Administrator" : "User", "Dwarf");
@@ -83,6 +95,13 @@ namespace WebAPIAuth.Controllers
             }
         }
 
+        /// <summary>
+        /// Get information for current user, strict JWT Bearer authorization
+        /// </summary>
+        /// <returns>User information from JWT Bearer token</returns>
+        /// <response code="200">User information about curent user.</response>
+        /// <response code="401">This response will be returned if the request is not authorized to access this resource.</response>
+        /// <response code="500">This response will be returned if there is an error in the system that prevents the purchase from being completed.</response>
         [HttpGet]
         [Route("GetCurrentUser")]
         [ProducesResponseType(typeof(UserInformation), StatusCodes.Status200OK)]
@@ -92,9 +111,11 @@ namespace WebAPIAuth.Controllers
         {
             try
             {
-                // Vytáhnu si dříve uložené NameIdentifier z HttpContext.User
-                var name = HttpContext.User.Identity?.Name;
+                // Get NameIdentifier from HttpContext.User
                 Int32.TryParse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier), out var nameIdentifier);
+                // User could be loaded from DB by nameIdentifier
+                // Or use Identity from ClaimsPrincipal
+                var name = HttpContext.User.Identity?.Name;
                 var authType = HttpContext.User.Identity?.AuthenticationType;
                 var roles = HttpContext.User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToArray();
                 var user = new UserInformation()
