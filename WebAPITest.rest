@@ -1,0 +1,25 @@
+
+@baseUrl = https://localhost:44310/api
+@contentType = application/json
+
+###
+# Login by username and password
+# @name login
+
+POST {{baseUrl}}/User/Login HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "userName": "admin",
+  "password": ""
+}
+
+###
+# Auth token
+@authToken = {{login.response.body.$.token}}
+
+###
+# Vrací informace o aktuálně přihlášeném uživateli
+GET {{baseUrl}}/User/GetCurrentUser HTTP/1.1
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
