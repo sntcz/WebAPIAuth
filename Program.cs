@@ -1,9 +1,13 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Server.IISIntegration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using WebAPIAuth.ApiKey;
 
 namespace WebAPIAuth
 {
@@ -27,9 +31,16 @@ namespace WebAPIAuth
                     Description = "Weather forecast test API with authorization.",
                 });
 
-                OpenApiSecurityScheme openApiSecurityScheme = new OpenApiSecurityScheme
+                // Set the comments path for the Swagger JSON and UI.
+                // Add <GenerateDocumentationFile>true</GenerateDocumentationFile> to project file
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                options.IncludeXmlComments(xmlPath);
+
+
+                OpenApiSecurityScheme jwtScheme = new OpenApiSecurityScheme
                 {
-                    Name = "Authorization",
+                    Name = "Bearer authentication",
                     Description = "JWT token must be provided. Enter __ONLY__ bearer token below.",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
@@ -42,20 +53,37 @@ namespace WebAPIAuth
                     }
                 };
 
-                options.AddSecurityDefinition("Bearer", openApiSecurityScheme);
+                options.AddSecurityDefinition("Bearer", jwtScheme);
+
+                OpenApiSecurityScheme apiKeyScheme = new OpenApiSecurityScheme
+                {
+                    Name = "X-API-KEY",
+                    Description = "Enter API KEY below.",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = ApiKeyDefaults.AuthenticationScheme,
+                    Reference = new OpenApiReference
+                    {
+                        Id = "ApiKey",
+                        Type = ReferenceType.SecurityScheme                        
+                    }
+                };
+
+                options.AddSecurityDefinition("ApiKey", apiKeyScheme);
 
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
-                        openApiSecurityScheme,
+                        jwtScheme,
+                        new string[]{ }
+                    },
+                    {
+                        apiKeyScheme,
                         new string[]{ }
                     }
                 });
 
             });
-
-            // API KEY Auth https://github.com/mihirdilip/aspnetcore-authentication-apikey
-            //  - with policy https://code-maze.com/aspnetcore-api-key-authentication/
 
             // NTLM Auth
             //builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
@@ -104,7 +132,8 @@ namespace WebAPIAuth
                 //    context.Response.StatusCode = 600;
                 //    return Task.CompletedTask;
                 //};
-            });
+            })
+            .AddApiKey(options => { options.ApiKey = builder.Configuration["ApiKey"]; });
             // <---- Mixed Auth
 
             /* ---- nevím jestli to musí být ----> */
