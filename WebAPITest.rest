@@ -8,7 +8,7 @@
 # and try to use current NTLM user.
 
 GET {{baseUrl}}/User/Login HTTP/1.1
-Content-Type: {{contentType}}
+Accept: {{contentType}}
 
 ###
 # Login by username and password
@@ -17,6 +17,7 @@ Content-Type: {{contentType}}
 # @name login
 
 POST {{baseUrl}}/User/Login HTTP/1.1
+Accept: {{contentType}}
 Content-Type: {{contentType}}
 
 {
@@ -31,18 +32,21 @@ Content-Type: {{contentType}}
 ###
 # Information about current user
 GET {{baseUrl}}/User/GetCurrentUser HTTP/1.1
+Accept: {{contentType}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
 ###
 # Information about API user
 GET {{baseUrl}}/User/GetIdentityUser HTTP/1.1
+Accept: {{contentType}}
 Content-Type: {{contentType}}
 X-API-KEY: API-KEY-123
 
 ###
 # Get weather forecast, Bearer authorization
 GET {{baseUrl}}/WeatherForecast HTTP/1.1
+Accept: {{contentType}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
