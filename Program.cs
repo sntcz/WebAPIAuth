@@ -171,9 +171,13 @@ namespace WebAPIAuth
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                // Sometimes you want to use swagger only in dev
+                //app.UseSwagger();
+                //app.UseSwaggerUI();
             }
+            // Swagger used always
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 
