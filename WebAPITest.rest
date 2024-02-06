@@ -1,20 +1,22 @@
+// Use VS Code with REST Client extension
+// which support named requests and dynamic variables
 
 @baseUrl = https://localhost:44310/api
 @contentType = application/json
 
 ###
-# Login by NTLM, but from rest plugin is unauthorized.
-# Browsers on Windows uses Www-Authenticate: Negotiate schema
-# and try to use current NTLM user.
+// Login by NTLM, but from rest plugin is unauthorized.
+// Browsers on Windows uses Www-Authenticate: Negotiate schema
+// and try to use current NTLM user.
 
 GET {{baseUrl}}/User/Login HTTP/1.1
 Accept: {{contentType}}
 
 ###
-# Login by username and password
-# Note: valid passwords are 123 or P@ssw0rd
-#       if username starts with "a", role will be "Administrator"
-# @name login
+// Login by username and password
+// Note: valid passwords are 123 or P@ssw0rd
+//       if username starts with "a", role will be "Administrator"
+// @name login
 
 POST {{baseUrl}}/User/Login HTTP/1.1
 Accept: {{contentType}}
@@ -26,43 +28,43 @@ Content-Type: {{contentType}}
 }
 
 ###
-# Auth token
+// Auth token
 @authToken = {{login.response.body.$.token}}
 
 ###
-# Information about current user
+// Information about current user
 GET {{baseUrl}}/User/GetCurrentUser HTTP/1.1
 Accept: {{contentType}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
 ###
-# Information about API user
+// Information about API user
 GET {{baseUrl}}/User/GetIdentityUser HTTP/1.1
 Accept: {{contentType}}
 Content-Type: {{contentType}}
 X-API-KEY: API-KEY-123
 
 ###
-# Get weather forecast, Bearer authorization
+// Get weather forecast, Bearer authorization
 GET {{baseUrl}}/WeatherForecast HTTP/1.1
 Accept: {{contentType}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
 ###
-# Get weather forecast, NO authorization
+// Get weather forecast, NO authorization
 GET {{baseUrl}}/WeatherForecast HTTP/1.1
 Content-Type: {{contentType}}
 
 ###
-# Get weather forecast, API key authorization
+// Get weather forecast, API key authorization
 GET {{baseUrl}}/WeatherForecast HTTP/1.1
 Content-Type: {{contentType}}
 X-API-KEY: API-KEY-123
 
 ###
-# Get weather forecast, wrong API key authorization
+// Get weather forecast, wrong API key authorization
 GET {{baseUrl}}/WeatherForecast HTTP/1.1
 Content-Type: {{contentType}}
 X-API-KEY: WRONG-KEY

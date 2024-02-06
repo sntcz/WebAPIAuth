@@ -37,7 +37,8 @@ namespace WebAPIAuth
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 options.IncludeXmlComments(xmlPath);
 
-
+                // The AddSecurityDefinition and AddSecurityRequirement methods enable the JWT and API KEY
+                // authentication for the Swagger UI.
                 OpenApiSecurityScheme jwtScheme = new OpenApiSecurityScheme
                 {
                     Name = "Bearer authentication",
@@ -52,9 +53,10 @@ namespace WebAPIAuth
                         Type = ReferenceType.SecurityScheme,
                     }
                 };
-
                 options.AddSecurityDefinition("Bearer", jwtScheme);
+                // <---- JWT Bearer security scheme
 
+                // API KEY security scheme ---->
                 OpenApiSecurityScheme apiKeyScheme = new OpenApiSecurityScheme
                 {
                     Name = "X-API-KEY",
@@ -68,8 +70,8 @@ namespace WebAPIAuth
                         Type = ReferenceType.SecurityScheme
                     }
                 };
-
                 options.AddSecurityDefinition("ApiKey", apiKeyScheme);
+                // <---- API KEY security scheme
 
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
@@ -111,8 +113,8 @@ namespace WebAPIAuth
                 options.DefaultAuthenticateScheme = NegotiateDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddNegotiate()
-            .AddJwtBearer(options =>
+            .AddNegotiate() // <-- must be, negotiate authentication
+            .AddJwtBearer(options => // <-- JWT Bearer authentcation
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -133,7 +135,7 @@ namespace WebAPIAuth
                 //    return Task.CompletedTask;
                 //};
             })
-            .AddApiKey(options =>
+            .AddApiKey(options => // <-- API Key authentication, see ApiKey folder for implementation
             {
                 options.ApiKey = builder.Configuration["ApiKey:Key"];
                 options.OwnerName = builder.Configuration["ApiKey:Owner"];
@@ -146,7 +148,7 @@ namespace WebAPIAuth
             });
             // <---- Mixed Auth
 
-            /* ---- nevím jestli to musí být ----> */
+            /* ---- I don't know why, I can't explain this ----> */
             builder.Services.AddAuthorization(options =>
             {
                 // By default, all incoming requests will be authorized according to the default policy.
@@ -164,7 +166,7 @@ namespace WebAPIAuth
             {
                 options.AutomaticAuthentication = false;
             });
-            /* <---- nevím jestli to musí být ---- */
+            /* <---- I don't know why, I can't explain this ---- */
 
             var app = builder.Build();
 
