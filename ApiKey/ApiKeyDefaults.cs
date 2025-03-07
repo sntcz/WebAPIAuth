@@ -2,7 +2,12 @@
 
 namespace WebAPIAuth.ApiKey
 {
-    // https://matteosonoio.it/aspnet-core-authentication-schemes/
+    /// <summary>
+    /// Default values for API Key Authentication
+    /// </summary>
+    /// <remarks>
+    /// See also <seealso href="https://matteosonoio.it/aspnet-core-authentication-schemes/"/>
+    /// </remarks>
     public static class ApiKeyDefaults
     {
         public const string AuthenticationScheme = "ApiKey";

@@ -6,6 +6,12 @@ using Microsoft.Extensions.Options;
 
 namespace WebAPIAuth.ApiKey
 {
+    /// <summary>
+    /// API Key Authentication handler
+    /// </summary>
+    /// <remarks>
+    /// See also <seealso href="https://matteosonoio.it/aspnet-core-authentication-schemes/"/>
+    /// </remarks>
     public class ApiKeyHandler : AuthenticationHandler<ApiKeyOptions>
     {
         /// <summary>
@@ -16,7 +22,7 @@ namespace WebAPIAuth.ApiKey
         /// <param name="encoder">The <see cref="UrlEncoder"/>.</param>
         /// <param name="clock">The <see cref="ISystemClock"/>.</param>
 #if NET8_0_OR_GREATER
-        public ApiKeyInHeaderHandler(IOptionsMonitor<ApiKeyOptions> options, ILoggerFactory logger, UrlEncoder encoder)
+        public ApiKeyHandler(IOptionsMonitor<ApiKeyOptions> options, ILoggerFactory logger, UrlEncoder encoder)
             : base(options, logger, encoder)
         { /* NOP */ }
 

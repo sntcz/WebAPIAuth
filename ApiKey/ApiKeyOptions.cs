@@ -7,6 +7,12 @@ using Microsoft.Extensions.Options;
 
 namespace WebAPIAuth.ApiKey
 {
+    /// <summary>
+    /// Simple options for API Key Authentication
+    /// </summary>
+    /// <remarks>
+    /// See also <seealso href="https://matteosonoio.it/aspnet-core-authentication-schemes/"/>
+    /// </remarks>
     public class ApiKeyOptions : AuthenticationSchemeOptions
     {
         /// <summary>
